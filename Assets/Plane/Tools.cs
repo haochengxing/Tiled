@@ -36,10 +36,11 @@ public class Tools : MonoBehaviour
 
     private void GetPerspectivePosition()
     {
-        cube0.transform.position = CalcScreenToPlanePositon(mCamera, 0, 0, 0);
-        cube1.transform.position = CalcScreenToPlanePositon(mCamera, 1, 0, 0);
-        cube2.transform.position = CalcScreenToPlanePositon(mCamera, 1, 1, 0);
-        cube3.transform.position = CalcScreenToPlanePositon(mCamera, 0, 1, 0);
+        float planeHeight = plane.transform.position.y;
+        cube0.transform.position = CalcScreenToPlanePositon(mCamera, 0, 0, planeHeight);
+        cube1.transform.position = CalcScreenToPlanePositon(mCamera, 1, 0, planeHeight);
+        cube2.transform.position = CalcScreenToPlanePositon(mCamera, 1, 1, planeHeight);
+        cube3.transform.position = CalcScreenToPlanePositon(mCamera, 0, 1, planeHeight);
 
     }
 

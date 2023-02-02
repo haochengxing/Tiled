@@ -16,21 +16,39 @@ public class Tools : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //GetPosition();
+        if (Camera.main.orthographic)
+        {
+            //正交相机
+            GetPosition();
+        }
+        else
+        {
+            //透视相机
+            GetPerspectivePosition();
+        }
+            
 
         //DrawRay();
 
-        GetPerspectivePosition();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        //GetPosition();
+        if (Camera.main.orthographic)
+        {
+            //正交相机
+            GetPosition();
+        }
+        else
+        {
+            //透视相机
+            GetPerspectivePosition();
+        }
 
         //DrawRay();
 
-        GetPerspectivePosition();
     }
 
 
@@ -85,7 +103,8 @@ public class Tools : MonoBehaviour
 
     private Vector3 CalcPlanePosition(Camera camera,Vector3 screenPos,float planeHeight)
     {
-        Vector3 worldPos = camera.ScreenToWorldPoint(screenPos);
+        //Vector3 worldPos = camera.ScreenToWorldPoint(screenPos);
+        Vector3 worldPos = StoWWorldPos(screenPos);
         Vector3 direction = (worldPos - camera.transform.position).normalized;
         Vector3 planeNormal = new Vector3(0, 1, 0);
         Vector3 planePos = new Vector3(0, planeHeight, 0);
@@ -149,5 +168,61 @@ public class Tools : MonoBehaviour
             cube3.transform.position = ray_rightButtom.GetPoint(enter);
         }
 
+    }
+
+
+    //mainCamera处理local到world的TRS变换
+    private Vector3 CameraLocalToWorldPos(Vector3 localpos)
+    {
+        return Camera.main.transform.localToWorldMatrix.MultiplyPoint3x4(localpos);
+    }
+
+    //将视口空间相对坐标转到世界坐标
+    //处理TRS矩阵变换
+    private Vector3 StoWWorldPos(Vector2 screenPos)
+    {
+        Vector3 local;
+        if (Camera.main.orthographic)
+        {
+            //正交相机
+            local = StoWLocalPos(screenPos);
+        }
+        else
+        {
+            //透视相机
+            local = StoWLocalPos1(screenPos);
+        }
+        return CameraLocalToWorldPos(local);
+    }
+
+
+
+    //正交相机
+    private Vector3 StoWLocalPos(Vector2 screenPos)
+    {
+        float halfhei = Camera.main.orthographicSize * 1;
+        float halfwid = halfhei * Camera.main.aspect;
+        float ratiox = (screenPos.x - Screen.width / 2) / (Screen.width / 2);
+        float ratioy = (screenPos.y - Screen.height / 2) / (Screen.height / 2);
+        float localx = halfwid * ratiox;
+        float localy = halfhei * ratioy;
+        Vector3 localxyz = new Vector3(localx, localy, 1);
+        return localxyz;
+    }
+
+
+    //透视相机
+    //计算视口空间中相对坐标
+    private Vector3 StoWLocalPos1(Vector2 screenPos)
+    {
+        float halffov = Camera.main.fieldOfView / 2;
+        float halfhei = Mathf.Tan(halffov * Mathf.Deg2Rad) * 1;
+        float halfwid = halfhei * Camera.main.aspect;
+        float ratiox = (screenPos.x - Screen.width / 2) / (Screen.width / 2);
+        float ratioy = (screenPos.y - Screen.height / 2) / (Screen.height / 2);
+        float localx = halfwid * ratiox;
+        float localy = halfhei * ratioy;
+        Vector3 localxyz = new Vector3(localx, localy, 1);
+        return localxyz;
     }
 }

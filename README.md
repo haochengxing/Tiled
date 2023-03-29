@@ -48,3 +48,19 @@ C# .Net设计模式与代码实现(二)——结构型模式
 
 https://blog.csdn.net/qq_31803267/article/details/125344589
 C# .Net设计模式与代码实现(三)——行为型模式
+
+
+
+
+https://blog.csdn.net/weixin_61361738/article/details/128824039
+线性结构
+1.数组（Array）
+2.链表（Linked List）
+3.栈（Stack）
+4.队列（Queue）
+5.哈希表（Hash）
+非线性结构
+1.树（Tree）
+2.堆（Heap）
+3.图（Graph）
+

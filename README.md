@@ -64,3 +64,5 @@ https://blog.csdn.net/weixin_61361738/article/details/128824039
 2.堆（Heap）
 3.图（Graph）
 
+https://www.cnblogs.com/HONT/archive/2013/06/05/3118531.html
+哈夫曼编码的C#实现

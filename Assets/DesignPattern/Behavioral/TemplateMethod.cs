@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 /// <summary>
-/// 模板方法（类）
+/// 模板方法
 /// </summary>
 public class TemplateMethod
 {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 /// <summary>
-/// 适配器模式（类）
+/// 适配器模式
 /// </summary>
 public class Adapter
 {

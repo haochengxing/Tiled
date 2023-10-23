@@ -1,6 +1,6 @@
 ﻿using System;
 /// <summary>
-/// 解释器模式（类）
+/// 解释器模式
 /// </summary>
 public class Interpreter
 {

@@ -85,7 +85,7 @@ public class TiledBaseInst : MonoBehaviour
     }
 
 
-    public void CreateQuadToArrays(Vector2 pos,int index,int uvindex)
+    public void CreateQuadToArrays(Vector2 pos,int index,uint uvindex)
     {
         int vIndex = index * 4;
         int vindex0 = vIndex;
@@ -116,15 +116,89 @@ public class TiledBaseInst : MonoBehaviour
         }
         else
         {
+            
+            uint kTMXTileHorizontalFlag = TMXTile.kTMXTileHorizontalFlag;
+            uint kTMXTileVerticalFlag = TMXTile.kTMXTileVerticalFlag;
+            uint kTMXTileDiagonalFlag = TMXTile.kTMXTileDiagonalFlag;
+            uint kFlippedMask = TMXTile.kFlippedMask;
+            
+            int f0=vindex0;
+            int f1=vindex1;
+            int f2=vindex2;
+            int f3=vindex3;
+            
+            if ((uvindex & kTMXTileDiagonalFlag)!=0)
+            {
+                // put the anchor in the middle for ease of rotation.
+                    
+                uint flag = uvindex & (kTMXTileHorizontalFlag | kTMXTileVerticalFlag );
+                    
+                // handle the 4 diagonally flipped states.
+                if (flag == kTMXTileHorizontalFlag)
+                {
+                    //Debug.Log("旋转90");
+                    f0=vindex1;
+                    f1=vindex2;
+                    f2=vindex3;
+                    f3=vindex0;
+                }
+                else if (flag == kTMXTileVerticalFlag)
+                {
+                    //Debug.Log("旋转270");
+                    f0=vindex3;
+                    f1=vindex0;
+                    f2=vindex1;
+                    f3=vindex2;
+                }
+                else if (flag == (kTMXTileVerticalFlag | kTMXTileHorizontalFlag) )
+                {
+                    //Debug.Log("旋转90 && x轴翻转");
+                    f0=vindex0;
+                    f1=vindex3;
+                    f2=vindex2;
+                    f3=vindex1;
+                }
+                else
+                {
+                    //Debug.Log("旋转270 && x轴翻转");
+                    f0=vindex2;
+                    f1=vindex1;
+                    f2=vindex0;
+                    f3=vindex3;
+                }
+            }
+            else
+            {
+                if ((uvindex & kTMXTileHorizontalFlag)!=0)
+                {
+                    //Debug.Log("x轴翻转");
+                    f0=vindex3;
+                    f1=vindex2;
+                    f2=vindex1;
+                    f3=vindex0;
+                }
+                    
+                if ((uvindex & kTMXTileVerticalFlag)!=0)
+                {
+                    //Debug.Log("y轴翻转");
+                    f0=vindex1;
+                    f1=vindex0;
+                    f2=vindex3;
+                    f3=vindex2;
+                }
+            }
+            
+            uvindex = (uvindex & kFlippedMask) >> 0;
+            
             uvindex = uvindex - 1;
-            int x = uvindex % 16;
-            int y = Mathf.FloorToInt(uvindex/16);
+            float x = uvindex % 16;
+            float y = Mathf.FloorToInt(uvindex/16);
             float offset = 1;
 
-            uvs[vindex0].Set((x* 128 + offset)/2048f,(((16-y-1)* 128) +offset)/ 2048f);
-            uvs[vindex1].Set((x* 128 + offset)/ 2048f, (((16-y)* 128) -offset)/ 2048f);
-            uvs[vindex2].Set((((x+1)* 128) - offset)/ 2048f, (((16-y)* 128) -offset)/ 2048f);
-            uvs[vindex3].Set((((x+1)* 128) - offset)/ 2048f, (((16-y-1)* 128) +offset)/ 2048f);
+            uvs[f0].Set((x* 128 + offset)/2048f,(((16-y-1)* 128) +offset)/ 2048f);
+            uvs[f1].Set((x* 128 + offset)/ 2048f, (((16-y)* 128) -offset)/ 2048f);
+            uvs[f2].Set((((x+1)* 128) - offset)/ 2048f, (((16-y)* 128) -offset)/ 2048f);
+            uvs[f3].Set((((x+1)* 128) - offset)/ 2048f, (((16-y-1)* 128) +offset)/ 2048f);
 
 
             int tIndex = index * 6;
@@ -148,7 +222,7 @@ public class TiledBaseInst : MonoBehaviour
             for (int y = 0; y < rectSize.y; y++)
             {
                 pos.Set(bottomLeftPos.x + x * cellSize, bottomLeftPos.y + y * cellSize);
-                int uvIndex = mgr.GetUVIndexByPosition(layerIndex, pos);
+                uint uvIndex = mgr.GetUVIndexByPosition(layerIndex, pos);
                 CreateQuadToArrays(pos,index,uvIndex);
                 index++;
             }

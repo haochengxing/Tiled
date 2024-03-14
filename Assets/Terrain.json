@@ -11,7 +11,11 @@
  "infinite":false,
  "layers":[
         {
-         "data":[33, 34, 18, 33, 33, 17, 37, 37, 37, 33, 33, 37, 119, 37, 33, 33, 37, 37, 37, 33, 35, 35, 35, 35, 35],
+         "data":[33, 34, 18, 33, 33,
+            17, 2147483667, 37, 3221225491, 33,
+            33, 37, 119, 37, 33,
+            33, 2684354579, 37, 1610612755, 33,
+            35, 35, 35, 35, 35],
          "height":5,
          "id":1,
          "name":"Terrain",
@@ -26,7 +30,7 @@
  "nextobjectid":1,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.4.2",
+ "tiledversion":"1.10.2",
  "tileheight":32,
  "tilesets":[
         {
@@ -35,6 +39,6 @@
         }],
  "tilewidth":32,
  "type":"map",
- "version":1.4,
+ "version":"1.10",
  "width":5
 }

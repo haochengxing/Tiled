@@ -26,9 +26,9 @@ public class TileBaseTool
 
             LayerData layerData = mapData.layers[i];
 
-            for (int y = 0; y < layerData.width; y++)
+            for (int x = 0; x < layerData.width; x++)
             {
-                for (int x = 0; x < layerData.height; x++)
+                for (int y = 0; y < layerData.height; y++)
                 {
                     Vector2Int pos = new Vector2Int(x,y);
                     int index = (layerData.height-1-y) * layerData.width + x;
@@ -39,28 +39,28 @@ public class TileBaseTool
             }
         }
 
-        List<short[,]> maps = new List<short[,]>();
+        List<uint[,]> maps = new List<uint[,]>();
         for (int i = 0; i < layerList.Count; i++)
         {
             MapLayer mapLayer = layerList[i];
 
             LayerData layerData = mapData.layers[i];
 
-            short[,] data = new short[layerData.width,layerData.height];
+            uint[,] data = new uint[layerData.width,layerData.height];
 
-            for (int y = 0; y < layerData.width; y++)
+            for (int x = 0; x < layerData.width; x++)
             {
-                for (int x = 0; x < layerData.height; x++)
+                for (int y = 0; y < layerData.height; y++)
                 {
                     Vector2Int index = new Vector2Int(x,y);
 
                     if (mapLayer.idDic.ContainsKey(index))
                     {
-                        int id = (int)mapLayer.idDic[index];
+                        uint id = mapLayer.idDic[index];
 
-                        id = id - mapLayer.firstgid;
+                        id = id - (uint)mapLayer.firstgid;
 
-                        data[x, y] = (short)id;
+                        data[x, y] = id;
                     }
                 }
             }

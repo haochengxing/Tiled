@@ -80,8 +80,7 @@ public class TouchCenterScaleUI : ScrollRect
                     // 计算缩放比例
                     int sign = Math.Sign(currentDistance - _initialDistance);
                     _targetScale += sign*scaleSensitivity;
-                    _targetScale = Mathf.Clamp(_targetScale, minScale, maxScale);
-                    Scale(_targetScale);
+                    ScaleUI(_targetScale);
                     // 更新初始距离为当前距离（用于下一次计算）
                     _initialDistance = currentDistance;
                 }
@@ -94,8 +93,8 @@ public class TouchCenterScaleUI : ScrollRect
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0)
         {
-            float scaleFactor = 1f + scroll * scaleSensitivity*10f; // 乘以10使滚轮更敏感
-            ScaleUI(scaleFactor);
+            _targetScale += scroll * scaleSensitivity*10f; // 乘以10使滚轮更敏感
+            ScaleUI(_targetScale);
         }
     }
     private void ScaleUI(float scaleFactor)
@@ -105,24 +104,9 @@ public class TouchCenterScaleUI : ScrollRect
         Vector2 anchoredPosition = rectTransform.anchoredPosition;
         anchoredPosition /= localScale.x;
         // 计算新的缩放比例
-        Vector3 newScale = localScale * scaleFactor;
-        float x = Mathf.Clamp(newScale.x, minScale, maxScale);
-        newScale = new Vector3(x, x, x);
+        float x = Mathf.Clamp(scaleFactor, minScale, maxScale);
         //保持中心点不变进行缩放
-        rectTransform.localScale = newScale;
-        //调整位置以保持中心点不变
-        rectTransform.anchoredPosition = anchoredPosition*x;
-    }
-    private void Scale(float x)
-    {
-        //就算缩放1下的位置
-        Vector3 localScale = rectTransform.localScale;
-        Vector2 anchoredPosition = rectTransform.anchoredPosition;
-        anchoredPosition /= localScale.x;
-        // 计算新的缩放比例
-        Vector3 newScale = new Vector3(x, x, x);
-        //保持中心点不变进行缩放
-        rectTransform.localScale = newScale;
+        rectTransform.localScale = new Vector3(x, x, x);
         //调整位置以保持中心点不变
         rectTransform.anchoredPosition = anchoredPosition*x;
     }

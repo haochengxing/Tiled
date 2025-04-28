@@ -42,11 +42,11 @@ public class TiledBaseInst : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+#if UNITY_EDITOR
         TextAsset obj = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Terrain.bytes");
 
         mgr.DeserializeTerrainData(obj);
-
+#endif
         Init(new Vector2(3, 3));
 
         if (moveCamera)

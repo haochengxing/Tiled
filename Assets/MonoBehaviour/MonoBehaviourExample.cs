@@ -13,8 +13,9 @@ public class MonoBehaviourExample : MonoBehaviour
         StartCoroutine("Test");//启动协程。
         StopAllCoroutines();//停止在该行为上运行的所有协同程序。
         StopCoroutine("Test");//停止在该行为上运行的第一个名为 methodName 的协同程序或存储在 routine 中的协同程序。
-
+#if UNITY_EDITOR
         runInEditMode = false;//允许 MonoBehaviour 的特定实例在编辑模式下运行（仅可在 Editor 中使用）。
+#endif
         useGUILayout = false;//禁用该属性可跳过 GUI 布局阶段。
 
         print("打印");//将消息记录到 Unity 控制台（与 Debug.Log 相同）。

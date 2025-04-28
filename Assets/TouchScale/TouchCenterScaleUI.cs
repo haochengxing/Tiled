@@ -1,26 +1,52 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(RectTransform))]
-public class TouchCenterScaleUI : MonoBehaviour
+public class TouchCenterScaleUI : ScrollRect
 {
     [SerializeField]
     private float minScale = 0.5f; // 最小缩放比例
     [SerializeField]
     private float maxScale = 2f; // 最大缩放比例
     [SerializeField]
-    private float scaleSensitivity = 1f; // 缩放灵敏度
-    private RectTransform _rectTransform;
-    // 用于双指缩放
-    private float _prevTouchDistance;
-    private bool _isScaling;
-    private void Awake()
+    private float scaleSensitivity = .1f; // 缩放灵敏度
+    [SerializeField]
+    private RectTransform rectTransform;
+    private int _touchNum;
+    private float _initialDistance;
+    private float _targetScale = 1f;
+    protected override void Start()
     {
-        _rectTransform = GetComponent<RectTransform>();
-        // 确保初始pivot是0.5,0.5（中心）
-        if (_rectTransform.pivot != new Vector2(0.5f, 0.5f))
+        base.Start();
+        if (rectTransform)
         {
-            Debug.LogWarning("UI元素的pivot不是中心点(0.5,0.5)，缩放可能不如预期", this);
+            _targetScale = rectTransform.localScale.x;
         }
+    }
+    public override void OnBeginDrag(PointerEventData eventData)
+    {
+        if (Input.touchCount > 1)
+        {
+            return;
+        }
+        base.OnBeginDrag(eventData);
+    }
+    public override void OnDrag(PointerEventData eventData)
+    {
+        if (Input.touchCount > 1)
+        {
+            _touchNum = Input.touchCount;
+            return;
+        }
+        if (Input.touchCount == 1 && _touchNum > 1)
+        {
+            _touchNum = Input.touchCount;
+            base.OnBeginDrag(eventData);
+            return;
+        }
+        base.OnDrag(eventData);
     }
     private void Update()
     {
@@ -34,50 +60,32 @@ public class TouchCenterScaleUI : MonoBehaviour
     }
     private void HandleTouchInput()
     {
-        if (Input.touchCount == 1)
+        // 检查是否有两个手指触摸屏幕
+        if (Input.touchCount == 2)
         {
-            // 单指触摸 - 可以在这里添加拖动逻辑
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved)
+            Touch touch0 = Input.GetTouch(0);
+            Touch touch1 = Input.GetTouch(1);
+            // 至少有一个手指在移动
+            if (touch0.phase == TouchPhase.Moved || touch1.phase == TouchPhase.Moved)
             {
-                // 可以在这里添加单指操作逻辑
-            }
-        }
-        else if (Input.touchCount == 2)
-        {
-            // 双指缩放
-            Touch firstTouch = Input.GetTouch(0);
-            Touch secondTouch = Input.GetTouch(1);
-            // 获取当前触摸点位置
-            Vector2 firstTouchCurrentPos = firstTouch.position;
-            Vector2 secondTouchCurrentPos = secondTouch.position;
-            // 计算当前触摸距离
-            float currentTouchDistance = Vector2.Distance(firstTouchCurrentPos, secondTouchCurrentPos);
-            if (firstTouch.phase == TouchPhase.Began || secondTouch.phase == TouchPhase.Began)
-            {
-                // 记录初始触摸位置和距离
-                _prevTouchDistance = currentTouchDistance;
-                _isScaling = true;
-            }
-            else if (firstTouch.phase == TouchPhase.Moved || secondTouch.phase == TouchPhase.Moved)
-            {
-                if (_isScaling)
+                // 计算当前两指距离
+                float currentDistance = Vector2.Distance(touch0.position, touch1.position);
+                // 初始化初始距离（仅在开始时记录）
+                if (touch0.phase == TouchPhase.Began || touch1.phase == TouchPhase.Began)
+                {
+                    _initialDistance = currentDistance;
+                }
+                else
                 {
                     // 计算缩放比例
-                    float scaleFactor = currentTouchDistance / _prevTouchDistance;
-                    ScaleUI(scaleFactor);
-                    // 更新前一个位置和距离
-                    _prevTouchDistance = currentTouchDistance;
+                    int sign = Math.Sign(currentDistance - _initialDistance);
+                    _targetScale += sign*scaleSensitivity;
+                    _targetScale = Mathf.Clamp(_targetScale, minScale, maxScale);
+                    Scale(_targetScale);
+                    // 更新初始距离为当前距离（用于下一次计算）
+                    _initialDistance = currentDistance;
                 }
             }
-            else if (firstTouch.phase == TouchPhase.Ended || secondTouch.phase == TouchPhase.Ended)
-            {
-                _isScaling = false;
-            }
-        }
-        else
-        {
-            _isScaling = false;
         }
     }
     private void HandleMouseInput()
@@ -86,23 +94,36 @@ public class TouchCenterScaleUI : MonoBehaviour
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0)
         {
-            float scaleFactor = 1f + scroll * scaleSensitivity; // 乘以10使滚轮更敏感
+            float scaleFactor = 1f + scroll * scaleSensitivity*10f; // 乘以10使滚轮更敏感
             ScaleUI(scaleFactor);
         }
     }
     private void ScaleUI(float scaleFactor)
     {
         //就算缩放1下的位置
-        Vector3 localScale = _rectTransform.localScale;
-        Vector2 anchoredPosition = _rectTransform.anchoredPosition;
+        Vector3 localScale = rectTransform.localScale;
+        Vector2 anchoredPosition = rectTransform.anchoredPosition;
         anchoredPosition /= localScale.x;
         // 计算新的缩放比例
         Vector3 newScale = localScale * scaleFactor;
         float x = Mathf.Clamp(newScale.x, minScale, maxScale);
         newScale = new Vector3(x, x, x);
         //保持中心点不变进行缩放
-        _rectTransform.localScale = newScale;
+        rectTransform.localScale = newScale;
         //调整位置以保持中心点不变
-        _rectTransform.anchoredPosition = anchoredPosition*newScale.x;
+        rectTransform.anchoredPosition = anchoredPosition*x;
+    }
+    private void Scale(float x)
+    {
+        //就算缩放1下的位置
+        Vector3 localScale = rectTransform.localScale;
+        Vector2 anchoredPosition = rectTransform.anchoredPosition;
+        anchoredPosition /= localScale.x;
+        // 计算新的缩放比例
+        Vector3 newScale = new Vector3(x, x, x);
+        //保持中心点不变进行缩放
+        rectTransform.localScale = newScale;
+        //调整位置以保持中心点不变
+        rectTransform.anchoredPosition = anchoredPosition*x;
     }
 }

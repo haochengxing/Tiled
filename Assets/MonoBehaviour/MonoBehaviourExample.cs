@@ -48,7 +48,7 @@ public class MonoBehaviourExample : MonoBehaviour
     {
         Debug.Log("在应用程序退出前，发送给所有游戏对象。    Step 11 ");
     }
-    void OnAudioFilterRead()
+    void OnAudioFilterRead(float[] data, int channels)
     {
         Debug.Log("如果实现了 OnAudioFilterRead，Unity 将在音频 DSP 链中插入一个自定义滤波器。");
     }
@@ -208,7 +208,7 @@ public class MonoBehaviourExample : MonoBehaviour
     {
         Debug.Log("在摄像机开始渲染场景前，将调用 OnPreRender。    Step 9 ");
     }
-    void OnRenderImage()
+    void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         Debug.Log("OnRenderImage 在图像的所有渲染操作全部完成后调用。");
     }

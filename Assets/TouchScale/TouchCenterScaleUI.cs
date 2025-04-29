@@ -12,6 +12,8 @@ public class TouchCenterScaleUI : ScrollRect
     private float maxScale = 2f; // 最大缩放比例
     [SerializeField]
     private float scaleSensitivity = .1f; // 缩放灵敏度
+    [SerializeField] 
+    private float distanceScale = 30f; // 缩放距离
     [SerializeField]
     private RectTransform rectTransform;
     private int _touchNum;
@@ -57,6 +59,7 @@ public class TouchCenterScaleUI : ScrollRect
         // 在设备上使用触摸输入
         HandleTouchInput();
         #endif
+        _targetScale = rectTransform.localScale.x;
     }
     private void HandleTouchInput()
     {
@@ -77,8 +80,13 @@ public class TouchCenterScaleUI : ScrollRect
                 }
                 else
                 {
+                    float d = currentDistance - _initialDistance;
+                    if (Math.Abs(d)<distanceScale)
+                    {
+                        return;
+                    }
                     // 计算缩放比例
-                    int sign = Math.Sign(currentDistance - _initialDistance);
+                    int sign = Math.Sign(d);
                     _targetScale += sign*scaleSensitivity;
                     ScaleUI(_targetScale);
                     // 更新初始距离为当前距离（用于下一次计算）
@@ -93,7 +101,7 @@ public class TouchCenterScaleUI : ScrollRect
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0)
         {
-            _targetScale += scroll * scaleSensitivity*10f; // 乘以10使滚轮更敏感
+            _targetScale += scroll * scaleSensitivity * 10f; // 乘以10使滚轮更敏感
             ScaleUI(_targetScale);
         }
     }
